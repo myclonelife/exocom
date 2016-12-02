@@ -1,0 +1,35 @@
+hash: f850b9d2c09aa27f3f7ee778737b1d84db6e725bfedb799846164c85e28abc81
+updated: 2016-12-01T10:21:26.396083165-08:00
+imports:
+- name: github.com/gucumber/gucumber
+  version: 71608e2f6e76fd4da5b09a376aeec7a5c0b5edbc
+- name: github.com/satori/go.uuid
+  version: b061729afc07e77a8aa4fad0a2fd840958f1942a
+- name: github.com/stretchr/testify
+  version: 69483b4bd14f5845b5a1e55bca19e954e827f1d0
+  subpackages:
+  - assert
+- name: golang.org/x/net
+  version: 55a3084c9119aeb9ba2437d595b0a7e9cb635da9
+  subpackages:
+  - websocket
+testImports:
+- name: github.com/DATA-DOG/godog
+  version: 2e189ad0f9dee046e42bb5f04a7ec5e91ec0700e
+  subpackages:
+  - colors
+  - gherkin
+- name: github.com/fatih/color
+  version: bf82308e8c8546dc2b945157173eb8a959ae9505
+- name: github.com/mattn/go-colorable
+  version: d228849504861217f796da67fae4f6e347643f15
+- name: github.com/mattn/go-isatty
+  version: 30a891c33c7cde7b02a981314b4228ec99380cca
+- name: github.com/Originate/exocom-mock-go
+  version: fc4810bc3a9f3b1c3baac003dd8d824f5acadeae
+- name: golang.org/x/sys
+  version: 30237cf4eefd639b184d1f2cb77a581ea0be8947
+  subpackages:
+  - unix
+- name: gopkg.in/tylerb/graceful.v1
+  version: 50a48b6e73fcc75b45e22c05b79629a67c79e938
