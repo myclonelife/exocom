@@ -1,7 +1,12 @@
-package: github.com/Originate/exorelay-go
+package: github.com/Originate/exocom/exorelay-go
 import:
-- package: github.com/gucumber/gucumber
-- package: github.com/stretchr/testify
-  version: v1.1.4
+- package: github.com/satori/go.uuid
+  version: v1.1.0
+- package: golang.org/x/net
   subpackages:
-  - assert
+  - websocket
+testImport:
+- package: github.com/DATA-DOG/godog
+  version: v0.6.1
+  subpackages:
+  - gherkin

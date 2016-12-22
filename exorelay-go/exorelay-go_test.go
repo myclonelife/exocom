@@ -1,4 +1,4 @@
-package main
+package exorelay
 
 import (
 	"encoding/json"
@@ -12,14 +12,13 @@ import (
 
 	"github.com/DATA-DOG/godog"
 	"github.com/DATA-DOG/godog/gherkin"
-	"github.com/Originate/exocom-mock-go"
-	"github.com/Originate/exorelay-go/exorelay"
+	"github.com/Originate/exocom/exocom-mock-go"
 )
 
 func FeatureContext(s *godog.Suite) {
-	var relay *exorelay.Relay
+	var relay *Relay
 	var exocom *exocomMock.ExoCom
-	var lastMessageId string // message ID of last message
+	var lastMessageID string // message ID of last message
 	var lastErr error        // Last error returned
 
 	s.AfterScenario(func(interface{}, error) {
@@ -36,14 +35,15 @@ func FeatureContext(s *godog.Suite) {
 
 	s.Step(`^an ExoRelay instance running inside the "([^"]*)" service on port (\d+)$`, func(serviceName string, port int) error {
 		var err error
-		relay, err = exorelay.New(serviceName, "localhost", port)
+		relay, err = New(serviceName, "localhost", port)
 		if err != nil {
 			return err
 		}
+		timeout := time.After(500 * time.Millisecond)
 		for {
 			select {
-			case <-time.After(500 * time.Millisecond):
-				return fmt.Errorf("Service %s could not be registered.", serviceName)
+			case <-timeout:
+				return fmt.Errorf("service %s could not be registered", serviceName)
 			default:
 				if _, registered := exocom.Services[serviceName]; registered {
 					return nil
@@ -54,13 +54,13 @@ func FeatureContext(s *godog.Suite) {
 
 	s.Step(`^sending a message with the name "([^"]*)" and no payload$`, func(name string) error {
 		var err error
-		lastMessageId, lastErr = relay.Send(name, "")
+		lastMessageID, lastErr = relay.Send(name, "")
 		return err
 	})
 
 	s.Step(`^sending the message:$`, func(message *gherkin.DocString) error {
 		var err error
-		var outgoing exorelay.Message
+		var outgoing Message
 		if err := json.Unmarshal([]byte(message.Content), &outgoing); err != nil {
 			return err
 		}
@@ -68,12 +68,12 @@ func FeatureContext(s *godog.Suite) {
 		if err != nil {
 			return err
 		}
-		lastMessageId, err = relay.Send(outgoing.Name, string(payload))
+		lastMessageID, err = relay.Send(outgoing.Name, string(payload))
 		return err
 	})
 
 	s.Step(`^trying to send an empty message$`, func() error {
-		lastMessageId, lastErr = relay.Send("", "")
+		lastMessageID, lastErr = relay.Send("", "")
 		if lastErr == nil {
 			return errors.New("Sending empty message was successful")
 		}
@@ -89,10 +89,11 @@ func FeatureContext(s *godog.Suite) {
 			temp, _ := json.Marshal(expected.Payload)
 			expected.Payload = string(temp)
 		}
+		timeout := time.After(500 * time.Millisecond)
 		for {
 			select {
-			case <-time.After(500 * time.Millisecond):
-				return errors.New("Expected message not received.")
+			case <-timeout:
+				return errors.New("expected message not received")
 			default:
 				for _, received := range exocom.ReceivedMessages {
 					expected.ID = received.ID

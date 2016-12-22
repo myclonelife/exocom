@@ -11,6 +11,7 @@ import (
 	// MessageSender
 )
 
+// Message struct to format messages. Mainly available for testing
 type Message struct {
 	Name         string      `json:"name,omitempty"`
 	Sender       string      `json:"sender,omitempty"`
@@ -21,6 +22,7 @@ type Message struct {
 	ResponseTime int         `json:"timestamp,omitempty"`
 }
 
+// information about an ExoRelay instance
 type Relay struct {
 	ServiceName string
 	ExocomHost  string
@@ -28,6 +30,7 @@ type Relay struct {
 	websocket   *websocket.Conn
 }
 
+// creates a new Relay instance connected to ExoCom
 func New(ServiceName, ExocomHost string, ExocomPort int) (*Relay, error) {
 	ws, err := websocket.Dial(url(ExocomHost, ExocomPort), "", origin(ExocomHost))
 	if err != nil {
@@ -43,10 +46,12 @@ func New(ServiceName, ExocomHost string, ExocomPort int) (*Relay, error) {
 	return &Relay{ServiceName, ExocomHost, ExocomPort, ws}, err
 }
 
+// closes the connection to ExoCom
 func (relay *Relay) Close() error {
 	return relay.websocket.Close()
 }
 
+// sends a message with the given name and payload to ExoCom
 func (relay *Relay) Send(name, payload string) (string, error) {
 	if payload == "" && name == "" {
 		return "", errors.New("ExoRelay.Send cannot send empty messages")
@@ -61,11 +66,13 @@ func (relay *Relay) Send(name, payload string) (string, error) {
 	return message.ID, err
 }
 
+// handles incoming messages
 func (relay *Relay) OnIncomingMessage(request string) (string, error) {
 	fmt.Println("OnIncomingMessage is unimplemented")
 	return "error", errors.New("OnIncomingMessage is unimplemented\n")
 }
 
+// sends the routing configuration to ExoCom
 func (relay *Relay) SendRoutingConfig() error {
 	fmt.Println("SendRoutingConfig is unimplemented")
 	return errors.New("SendRoutingConfig is unimplemented\n")
@@ -77,13 +84,4 @@ func origin(host string) string {
 
 func url(host string, port int) string {
 	return fmt.Sprintf("ws://%s:%d/services", host, port)
-}
-
-func NewMessage(name, sender, payload string) Message {
-	return Message{
-		Name:    name,
-		Sender:  sender,
-		Payload: payload,
-		ID:      uuid.NewV4().String(),
-	}
 }

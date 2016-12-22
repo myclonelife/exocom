@@ -1,14 +1,8 @@
-hash: f850b9d2c09aa27f3f7ee778737b1d84db6e725bfedb799846164c85e28abc81
-updated: 2016-12-01T10:21:26.396083165-08:00
+hash: 435a2ac30049de1daf2e226f607b2b51ab47b05164cf1adf8c97177d956e3d0c
+updated: 2016-12-21T21:07:54.220964488-08:00
 imports:
-- name: github.com/gucumber/gucumber
-  version: 71608e2f6e76fd4da5b09a376aeec7a5c0b5edbc
 - name: github.com/satori/go.uuid
-  version: b061729afc07e77a8aa4fad0a2fd840958f1942a
-- name: github.com/stretchr/testify
-  version: 69483b4bd14f5845b5a1e55bca19e954e827f1d0
-  subpackages:
-  - assert
+  version: 879c5887cd475cd7864858769793b2ceb0d44feb
 - name: golang.org/x/net
   version: 55a3084c9119aeb9ba2437d595b0a7e9cb635da9
   subpackages:
@@ -25,8 +19,10 @@ testImports:
   version: d228849504861217f796da67fae4f6e347643f15
 - name: github.com/mattn/go-isatty
   version: 30a891c33c7cde7b02a981314b4228ec99380cca
-- name: github.com/Originate/exocom-mock-go
-  version: fc4810bc3a9f3b1c3baac003dd8d824f5acadeae
+- name: github.com/Originate/exocom
+  version: c1aeb8b0a721aceb68925eb1299be16407b3bb03
+  subpackages:
+  - exocom-mock-go
 - name: golang.org/x/sys
   version: 30237cf4eefd639b184d1f2cb77a581ea0be8947
   subpackages:
