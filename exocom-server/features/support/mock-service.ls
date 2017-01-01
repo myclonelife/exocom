@@ -18,7 +18,7 @@ class MockService
     @closed = yes
 
 
-  connect: (done) ~>
+  connect: (payload = {@name}, done) ~>
     @socket = new WebSocket "ws://localhost:#{@port}/services"
       ..on 'message', @_on-socket-message
       ..on 'error', @_on-socket-error
@@ -26,8 +26,7 @@ class MockService
         @send do
           name: 'exocom.register-service'
           sender: @name
-          payload:
-            name: @name
+          payload: payload
           id: '123'
         done!
 

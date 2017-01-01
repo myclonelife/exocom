@@ -66,7 +66,7 @@ module.exports = ->
   @When /^a new "([^"]*)" service instance registers itself via the message "([^"]+)" and the payload:$/ (name, message-name, message-text, done) ->
     message-json = JSON.parse message-text
     (@service-mocks or= {})[name] = new MockService name: name, port: @exocom-port
-    @service-mocks[name].connect ->
+    @service-mocks[name].connect message-json, ->
       wait 200, done
 
 

@@ -27,7 +27,7 @@ CliWorld = !->
 
   @create-mock-service-at-port = ({name, port, namespace}, done) ->
     (@service-mocks or= {})[name] = new MockService {port, name, namespace}
-    @service-mocks[name].connect ->
+    @service-mocks[name].connect null, ->
       wait 200, done
 
 
