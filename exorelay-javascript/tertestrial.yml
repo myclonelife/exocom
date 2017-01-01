@@ -1,1 +1,14 @@
-mappings: js-cucumber-mocha
+actions:
+
+  - match:
+      filename: '\.feature$'
+    command: 'spec {{filename}}'
+
+  - match:
+      filename: '\.feature$'
+      line: '\d+'
+    command: 'spec {{filename}}:{{line}}'
+
+  - match:
+      filename: '\.ls$'
+    command: 'mocha --compilers ls:livescript {{filename}}'

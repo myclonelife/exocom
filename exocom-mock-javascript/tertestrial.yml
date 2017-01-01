@@ -8,9 +8,9 @@ actions:
 
   - match:
       filename: '\.feature$'
-    command: 'cucumber-js {{filename}}'
+    command: 'bin/spec {{filename}}'
 
   - match:
       filename: '\.feature$'
       line: '\d+'
-    command: 'cucumber-js {{filename}}:{{line}}'
+    command: 'bin/spec {{filename}}:{{line}}'
