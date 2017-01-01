@@ -19,7 +19,12 @@ Feature: Manage new instances of services
         }
       ]
       """
-    And a new "users" service
+    When a new "users" service instance registers with it via the message "exocom.register-service" and the payload:
+      """
+      {
+        "name": "users"
+      }
+      """
     Then ExoCom now knows about these services:
       | NAME  | INTERNAL NAMESPACE |
       | users | foo                |
