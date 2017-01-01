@@ -1,3 +1,2 @@
 #!/usr/bin/env bash
-
-yarn install
+npm install --loglevel error --depth 0
