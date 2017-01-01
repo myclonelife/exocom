@@ -13,11 +13,30 @@ Feature: Handling incoming replies to sent message
     And an ExoRelay instance called "exo-relay"
 
 
-  Scenario: handling replies to outgoing messages
+  Scenario: handling replies to outgoing messages via callbacks
     Given a hypothetical "print" message
     And I send a message with a reply handler:
       """
       exo-relay.send 'users.create', name: 'Will Riker', (createdUser, {outcome}) ->
+        print "created user #{createdUser.id} via '#{outcome}'"
+      """
+    When the reply arrives via this message:
+      """
+      name: 'users.created'
+      payload:
+        id: 456
+        name: 'Will Riker'
+      id: '123'
+      response-to: '<%= request_uuid %>'
+      """
+    Then the reply handler runs and in this example calls my "print" method with "created user 456 via 'users.created'"
+
+
+  Scenario: handling replies to outgoing messages via co
+    Given a hypothetical "print" message
+    And I send a message with a reply handler:
+      """
+      exo-relay.send('users.create', name: 'Will Riker').then (createdUser, {outcome}) ->
         print "created user #{createdUser.id} via '#{outcome}'"
       """
     When the reply arrives via this message:
