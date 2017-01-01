@@ -59,7 +59,11 @@ module.exports = ->
     wait 200, done
 
 
-  @When /^a new "([^"]*)" service instance registers with it via the message "([^"]+)" and the payload:$/ (name, message-name, message-text, done) ->
+  @When /^a new "([^"]*)" service$/ (name, done) ->
+    @create-mock-service-at-port {name, port: @exocom-port}, done
+
+
+  @When /^a new "([^"]*)" service instance registers itself via the message "([^"]+)" and the payload:$/ (name, message-name, message-text, done) ->
     message-json = JSON.parse message-text
     (@service-mocks or= {})[name] = new MockService name: name, port: @exocom-port
     @service-mocks[name].on 'online', ~>

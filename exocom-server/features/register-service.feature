@@ -19,7 +19,7 @@ Feature: Manage new instances of services
         }
       ]
       """
-    When a new "users" service instance registers with it via the message "exocom.register-service" and the payload:
+    When a new "users" service instance registers itself via the message "exocom.register-service" and the payload:
       """
       {
         "name": "users"
