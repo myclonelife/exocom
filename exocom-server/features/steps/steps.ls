@@ -5,6 +5,7 @@ require! {
   '../support/mock-service' : MockService
   'nitroglycerin' : N
   'port-reservation'
+  'prelude-ls' : {pairs-to-obj}
   'request'
   '../support/text-tools' : {ascii}
   'wait' : {wait}
@@ -63,10 +64,11 @@ module.exports = ->
     @create-mock-service-at-port {name, port: @exocom-port}, done
 
 
-  @When /^a new "([^"]*)" service instance registers itself via the message "([^"]+)" and the payload:$/ (name, message-name, message-text, done) ->
-    message-json = JSON.parse message-text
-    (@service-mocks or= {})[name] = new MockService name: name, port: @exocom-port
-    @service-mocks[name].connect message-json, ->
+  @When /^a new "([^"]*)" service instance registers itself via the message:$/ (name, table, done) ->
+    table-data = table.raw! |> pairs-to-obj
+    payload = JSON.parse table-data.PAYLOAD
+    (@service-mocks or= {})[name] = new MockService name: table-data.NAME, port: @exocom-port
+    @service-mocks[name].connect payload, ->
       wait 200, done
 
 
