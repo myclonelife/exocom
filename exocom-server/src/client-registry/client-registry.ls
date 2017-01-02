@@ -52,7 +52,6 @@ class ClientRegistry
       @subscribers.add do
         message: message
         client-name: service.name
-        namespace: @routing[service.name].internal-namespace
 
 
   deregister-client: (service-name) ->

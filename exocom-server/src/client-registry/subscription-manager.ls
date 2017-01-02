@@ -19,11 +19,11 @@ class SubscriptionManager
 
 
   # Adds the given client to the subscription list for the given message
-  add: ({message, client-name, namespace}) ->
+  add: ({message, client-name}) ->
     message-name = @external-message-name({message, service-name: client-name, internal-namespace: @routing[client-name].internal-namespace})
     (@subscribers[message-name] or= []).push do
       name: client-name
-      internal-namespace: namespace
+      internal-namespace: @routing[client-name].internal-namespace
 
 
   remove: (client-name) ->
