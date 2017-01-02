@@ -51,13 +51,6 @@ class ClientRegistry
     @subscribers = {}
 
 
-  # Sets the currently known service landscape to the given setup
-  set-routing-config: (services) ->
-    @reset!
-    for service in services
-      @register-service service
-
-
   # Adds service routing configurations to the given setup
   register-service: (service) ->
     @clients[service.name] =
