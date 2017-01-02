@@ -48,7 +48,7 @@ class ClientRegistry
       internal-namespace: @routing[service.name].internal-namespace
 
     # add subscriptions
-    @subscriptions.add-all client-name: service.name, messages: @routing[service.name].receives
+    @subscriptions.add-all client-name: service.name, internal-messages: @routing[service.name].receives
 
 
   deregister-client: (service-name) ->
