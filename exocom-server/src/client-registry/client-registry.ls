@@ -35,7 +35,7 @@ class ClientRegistry
     @clients = {}
 
 
-    @subscribers = new SubscriptionManager @routing
+    @subscriptions = new SubscriptionManager @routing
 
 
 
@@ -48,13 +48,13 @@ class ClientRegistry
       internal-namespace: @routing[service.name].internal-namespace
 
     # add subscriptions
-    @subscribers.add-all messages: @routing[service.name].receives, client-name: service.name
+    @subscriptions.add-all client-name: service.name, messages: @routing[service.name].receives
 
 
   deregister-client: (service-name) ->
 
     # remove subscriptions
-    @subscribers.remove service-name
+    @subscriptions.remove service-name
 
     # remove from clients list
     delete @clients[service-name]
@@ -62,7 +62,7 @@ class ClientRegistry
 
   # Returns the clients that are subscribed to the given message
   subscribers-for: (message-name) ->
-    @subscribers.subscribers-for message-name
+    @subscriptions.subscribers-for message-name
 
 
   can-send: (sender, message) ->
