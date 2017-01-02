@@ -69,7 +69,7 @@ class ClientRegistry
 
 
   # Returns the clients that are subscribed to the given message
-  subscribers-to: (message-name) ->
+  subscribers-for: (message-name) ->
     | @subscribers[message-name]  =>  @subscribers[message-name].receivers
 
 

@@ -69,7 +69,7 @@ class ExoCom extends EventEmitter
     message-data.name = external-message-name
     message-data.timestamp = nanoseconds process.hrtime!
     # determine the subscribers
-    subscribers = @client-registry.subscribers-to external-message-name
+    subscribers = @client-registry.subscribers-for external-message-name
     return 'no receivers' unless subscribers
     subscriber-names = [subscriber.name for subscriber in subscribers]
 
