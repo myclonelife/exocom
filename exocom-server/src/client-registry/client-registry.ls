@@ -37,9 +37,8 @@ class ClientRegistry
     # The format is:
     # {
     #   'message 1 name':
-    #     receivers:
-    #       * name: ...
-    #       * name: ...
+    #     * name: ...
+    #     * name: ...
     #   'message 2 name':
     #     ...
     @subscribers = {}
@@ -54,9 +53,8 @@ class ClientRegistry
       internal-namespace: @routing[service.name].internal-namespace
     for message in (@routing[service.name].receives or {})
       external-message = @external-message-name {message, service-name: service.name, internal-namespace: @routing[service.name].internal-namespace}
-      @subscribers[external-message] or= {}
-      @subscribers[external-message].receivers or= []
-      @subscribers[external-message].receivers.push do
+      @subscribers[external-message] or= []
+      @subscribers[external-message].push do
         name: service.name
         internal-namespace: @routing[service.name].internal-namespace
 
@@ -70,7 +68,7 @@ class ClientRegistry
 
   # Returns the clients that are subscribed to the given message
   subscribers-for: (message-name) ->
-    | @subscribers[message-name]  =>  @subscribers[message-name].receivers
+    @subscribers[message-name]
 
 
   can-send: (sender, message) ->
