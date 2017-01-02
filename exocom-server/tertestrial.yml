@@ -1,16 +1,16 @@
 actions:
 
   - match:
-    command: 'bin/spec'
+    command: 'spec'
 
   - match:
       filename: '\.feature$'
-    command: 'bin/spec {{filename}}'
+    command: 'spec {{filename}}'
 
   - match:
       filename: '\.feature$'
       line: '\d+'
-    command: 'bin/spec {{filename}}:{{line}}'
+    command: 'spec {{filename}}:{{line}}'
 
 
   - match:
