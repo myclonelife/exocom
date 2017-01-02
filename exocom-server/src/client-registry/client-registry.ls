@@ -38,19 +38,6 @@ class ClientRegistry
     @_set-routing service-messages
 
 
-  _set-routing: (routing-data) ->
-    for service in jsonic(routing-data)
-      @routing[service.name] =
-        receives: service.receives
-        sends: service.sends
-        internal-namespace: service.namespace
-
-
-  reset: ->
-    @clients = {}
-    @subscribers = {}
-
-
   # Adds service routing configurations to the given setup
   register-service: (service) ->
     @clients[service.name] =
@@ -110,6 +97,14 @@ class ClientRegistry
     | message-parts.length is 1                       =>  message
     | message-parts[0] is service.internal-namespace  =>  "#{service.name}.#{message-parts[1]}"
     | otherwise                                       =>  message
+
+
+  _set-routing: (routing-data) ->
+    for service in jsonic(routing-data)
+      @routing[service.name] =
+        receives: service.receives
+        sends: service.sends
+        internal-namespace: service.namespace
 
 
 
