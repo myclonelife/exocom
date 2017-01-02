@@ -26,21 +26,21 @@ class WebSocketSubsystem extends EventEmitter
     #   'client 2 name': websocket,
     #   ...
     # }
-    @service-sockets = {}
+    @sockets = {}
 
 
   # Registers the given websocket as a connection
   # to an instance of the service with the given name
   register-client: ({service-name, websocket}) ->
-    @service-sockets[service-name] = websocket
+    @sockets[service-name] = websocket
       ..on 'close', ~>
         @exocom.deregister-client service-name
         @deregister-client service-name
 
 
   deregister-client: (service-name) ->
-    @service-sockets[service-name]?.close!
-    delete @service-sockets[service-name]
+    @sockets[service-name]?.close!
+    delete @sockets[service-name]
 
 
   close: ->
@@ -107,7 +107,7 @@ class WebSocketSubsystem extends EventEmitter
       request-data.response-time = message-data.response-time
       request-data.response-to = message-data.response-to
     @_log-sending message-data, service
-    @service-sockets[service.name].send JSON.stringify request-data
+    @sockets[service.name].send JSON.stringify request-data
     result = {[key, value] for key, value of message-data}
     result.name = translated-message-name
     result
