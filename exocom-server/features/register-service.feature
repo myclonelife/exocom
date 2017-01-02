@@ -19,7 +19,7 @@ Feature: Manage new instances of services
         }
       ]
       """
-    When a new "users" service instance registers itself via the message:
+    When a new "users" service instance registers itself with it via the message:
       | NAME    | exocom.register-service |
       | PAYLOAD | { "name": "users" }     |
     Then ExoCom now knows about these services:

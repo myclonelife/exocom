@@ -64,11 +64,11 @@ module.exports = ->
     @create-mock-service-at-port {name, port: @exocom-port}, done
 
 
-  @When /^a new "([^"]*)" service instance registers itself via the message:$/ (name, table, done) ->
+  @When /^a new "([^"]*)" service instance registers itself with it via the message:$/ (name, table, done) ->
     table-data = table.raw! |> pairs-to-obj
-    payload = JSON.parse table-data.PAYLOAD
+    payload = table-data.PAYLOAD |> JSON.parse
     (@service-mocks or= {})[name] = new MockService name: table-data.NAME, port: @exocom-port
-    @service-mocks[name].connect payload, ->
+    @service-mocks[name].connect {payload}, ->
       wait 200, done
 
 

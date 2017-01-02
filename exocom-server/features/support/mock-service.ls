@@ -18,7 +18,8 @@ class MockService
     @closed = yes
 
 
-  connect: (payload = {@name}, done) ~>
+  connect: ({payload}, done) ~>
+    payload ?= {@name}
     @socket = new WebSocket "ws://localhost:#{@port}/services"
       ..on 'message', @_on-socket-message
       ..on 'error', @_on-socket-error
