@@ -16,11 +16,10 @@ class ExoCom extends EventEmitter
   ({@service-messages} = {}) ->
     @client-registry    = new ClientRegistry {@service-messages}
     @http-subsystem = new HttpSubsystem @
+      ..on 'online', (port) ~> @emit 'http-online', port
     @message-cache = new MessageCache!
     @websocket = new WebSocketSubsystem @
 
-    delegate 'httpPort', from: @, to: @http-subsystem
-    delegate-event 'http-bound' 'error', from: @http-subsystem, to: @
     delegate-event 'websocket-bound' 'error', 'warn', from: @websocket, to: @
 
 

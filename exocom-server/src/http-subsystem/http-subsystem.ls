@@ -4,7 +4,7 @@ require! {
   'express'
   'http'
 }
-debug = require('debug')('exocom:http-listener')
+debug = require('debug')('exocom:http-subsystem')
 
 
 # The administration endpoint for Exocom
@@ -56,4 +56,4 @@ class HttpSubsystem extends EventEmitter
 
 
 
-module.exports = HttpListener
+module.exports = HttpSubsystem
