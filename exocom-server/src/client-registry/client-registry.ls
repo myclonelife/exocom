@@ -41,8 +41,8 @@ class ClientRegistry
   _set-routing: (routing-data) ->
     for service in jsonic(routing-data)
       @routing[service.name] =
-        receives: service.receives,
-        sends: service.sends,
+        receives: service.receives
+        sends: service.sends
         internal-namespace: service.namespace
 
 
