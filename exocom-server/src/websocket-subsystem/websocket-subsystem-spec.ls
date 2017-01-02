@@ -13,7 +13,7 @@ require! {
 describe 'WebSocket', ->
 
 
-  describe 'send-to-service', (...) ->
+  describe 'send-message-to-service', (...) ->
 
     before-each (done) ->
       message =
@@ -31,7 +31,7 @@ describe 'WebSocket', ->
             ..connect {}, ~>
               wait 200, ~>
                 @exocom.websocket
-                  ..send-to-service message, services['mock-service']
+                  ..send-message-to-service message, services['mock-service']
                 done!
 
     after-each ->
