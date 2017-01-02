@@ -48,15 +48,18 @@ class ExoCom extends EventEmitter
     @websocket.listen port, express-server
     debug "Listening at port #{port}"
 
+
   # registers the service with the given data
   # as a sender and receiver of messages
   register-client: (routing-config) ~>
     @client-registry.register-client routing-config
 
+
   # deregisters a service with the given data
   # as a sender and receiver of messages
   deregister-client: (service-name) ~>
     @client-registry.deregister-client service-name
+
 
   # sends the given message to all subscribers of it.
   send-message: (message-data) ~>
