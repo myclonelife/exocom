@@ -20,8 +20,7 @@ class ClientRegistry
     #     internal-namespace: 'my internal namespace'
     #   'service 2 name':
     #     ...
-    @routing = {}
-    @_set-routing service-messages
+    @routing = @_parse-service-messages service-messages
 
     # List of clients that are currently registered
     #
@@ -84,13 +83,14 @@ class ClientRegistry
     | otherwise                                       =>  message
 
 
-  _set-routing: (routing-data) ->
-    for service in jsonic(routing-data)
-      @routing[service.name] =
+  _parse-service-messages: (service-messages) ->
+    result = {}
+    for service in jsonic(service-messages)
+      result[service.name] =
         receives: service.receives
         sends: service.sends
         internal-namespace: service.namespace
-
+    result
 
 
 module.exports = ClientRegistry
