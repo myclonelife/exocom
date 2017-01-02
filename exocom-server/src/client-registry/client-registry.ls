@@ -10,6 +10,15 @@ class ClientRegistry
   ({service-messages = '{}'} = {}) ->
 
     # List of messages that are received by the applications services
+    #
+    # the format is:
+    # {
+    #   'service 1 name':
+    #     receives: ['message 1', 'message 2']
+    #     sends: ['message 3', 'message 4']
+    #     internal-namespace: 'my internal namespace'
+    #   'service 2 name':
+    #     ...
     @routing = {}
 
     # List of clients that are currently registered
