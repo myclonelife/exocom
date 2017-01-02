@@ -9,7 +9,7 @@ require! {
 }
 
 
-console.log dim "ExoCom #{version}\n"
+console.log dim "Exocom #{version}\n"
 
 doc = """
 Provides Exosphere communication infrastructure services in development mode.
