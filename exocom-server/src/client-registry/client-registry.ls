@@ -42,7 +42,7 @@ class ClientRegistry
     #       * name: ...
     #   'message 2 name':
     #     ...
-    @routes = {}
+    @subscribers = {}
 
     @_set-routing service-messages
 
@@ -54,9 +54,9 @@ class ClientRegistry
       internal-namespace: @routing[service.name].internal-namespace
     for message in (@routing[service.name].receives or {})
       external-message = @external-message-name {message, service-name: service.name, internal-namespace: @routing[service.name].internal-namespace}
-      @routes[external-message] or= {}
-      @routes[external-message].receivers or= []
-      @routes[external-message].receivers.push do
+      @subscribers[external-message] or= {}
+      @subscribers[external-message].receivers or= []
+      @subscribers[external-message].receivers.push do
         name: service.name
         internal-namespace: @routing[service.name].internal-namespace
 
@@ -64,13 +64,13 @@ class ClientRegistry
   deregister-service: (service-name) ->
     for message in (@routing[service-name].receives or {})
       external-message = @external-message-name {message, service-name, internal-namespace: @clients[service-name].internal-namespace}
-      delete @routes[external-message]
+      delete @subscribers[external-message]
     delete @clients[service-name]
 
 
   # Returns the clients that are subscribed to the given message
   subscribers-to: (message-name) ->
-    | @routes[message-name]  =>  @routes[message-name].receivers
+    | @subscribers[message-name]  =>  @subscribers[message-name].receivers
 
 
   can-send: (sender, message) ->
