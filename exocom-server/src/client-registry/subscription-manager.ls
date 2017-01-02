@@ -18,6 +18,11 @@ class SubscriptionManager
     @subscribers = {}
 
 
+  add-all: ({messages, client-name}) ->
+    for message in messages or {}
+      @add {message, client-name}
+
+
   # Adds the given client to the subscription list for the given message
   add: ({message, client-name}) ->
     message-name = @external-message-name({message, service-name: client-name, internal-namespace: @routing[client-name].internal-namespace})
