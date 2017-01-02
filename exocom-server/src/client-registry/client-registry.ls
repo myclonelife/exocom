@@ -33,29 +33,21 @@ class ClientRegistry
     #     ...
     @clients = {}
 
-
     @subscriptions = new SubscriptionManager @routing
 
 
 
   # Adds service routing configurations to the given setup
   register-client: (service) ->
-
-    # add to clients list
     @clients[service.name] =
       name: service.name
       internal-namespace: @routing[service.name].internal-namespace
 
-    # add subscriptions
     @subscriptions.add-all client-name: service.name, service-type: service.name
 
 
   deregister-client: (service-name) ->
-
-    # remove subscriptions
     @subscriptions.remove service-name
-
-    # remove from clients list
     delete @clients[service-name]
 
 
@@ -70,11 +62,6 @@ class ClientRegistry
 
   # Returns the external name for the given message sent by the given service,
   # i.e. how the sent message should appear to the other services.
-  #
-  # Example:
-  # - service "tweets" has internal name "text-snippets"
-  # - it sends the message "text-snippets.created" to exocom
-  # - exocom converts this message to "tweets.created"
   outgoing-message-name: (message, service) ->
     message-parts = message.split '.'
     switch
@@ -91,6 +78,7 @@ class ClientRegistry
         sends: service.sends
         internal-namespace: service.namespace
     result
+
 
 
 module.exports = ClientRegistry
