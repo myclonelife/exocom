@@ -23,8 +23,8 @@ Feature: Manage new instances of services
       | NAME    | exocom.register-service |
       | PAYLOAD | { "name": "users" }     |
     Then ExoCom now knows about these services:
-      | NAME  | INTERNAL NAMESPACE |
-      | users | foo                |
+      | SERVICE NAME | INSTANCE NAME | INTERNAL NAMESPACE |
+      | users        | users service | foo                |
 
 
   Scenario: deregister a service once it goes offline
