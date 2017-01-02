@@ -18,8 +18,8 @@ class SubscriptionManager
     @subscribers = {}
 
 
-  add-all: ({internal-messages, client-name}) ->
-    for internal-message in internal-messages or {}
+  add-all: ({client-name, service-type}) ->
+    for internal-message in @routing[service-type].receives or {}
       @add {internal-message, client-name}
 
 
