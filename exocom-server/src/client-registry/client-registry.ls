@@ -45,11 +45,11 @@ class ClientRegistry
   set-routing-config: (services) ->
     @reset!
     for service in services
-      @add-routing-config service
+      @register-service service
 
 
   # Adds service routing configurations to the given setup
-  add-routing-config: (service) ->
+  register-service: (service) ->
     @clients[service.name] =
       name: service.name
       internal-namespace: @routing[service.name].internal-namespace
@@ -62,7 +62,7 @@ class ClientRegistry
         internal-namespace: @routing[service.name].internal-namespace
 
 
-  remove-routing-config: ({service-name}) ->
+  deregister-service: (service-name) ->
     for message in (@routing[service-name].receives or {})
       external-message = @external-message-name {message, service-name, internal-namespace: @clients[service-name].internal-namespace}
       delete @routes[external-message]

@@ -27,11 +27,11 @@ class WebSocketSubsystem extends EventEmitter
   register-service-instance: ({service-name, websocket}) ->
     @service-sockets[service-name] = websocket
       ..on 'close', ~>
-        @exocom.remove-routing-config {service-name}
-        @deregister-service-instance {service-name}
+        @exocom.deregister-service service-name
+        @deregister-service-instance service-name
 
 
-  deregister-service-instance: ({service-name}) ->
+  deregister-service-instance: (service-name) ->
     @service-sockets[service-name]?.close!
     delete @service-sockets[service-name]
 
@@ -69,7 +69,7 @@ class WebSocketSubsystem extends EventEmitter
 
   # called when a service instance registers itself with Exocom
   on-service-instance-registration: (payload, websocket) ->
-    @exocom.add-routing-config payload, websocket
+    @exocom.register-service payload, websocket
     @register-service-instance service-name: payload.name, websocket: websocket
 
 
