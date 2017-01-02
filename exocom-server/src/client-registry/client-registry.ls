@@ -53,8 +53,7 @@ class ClientRegistry
       internal-namespace: @routing[service.name].internal-namespace
     for message in (@routing[service.name].receives or {})
       external-message = @external-message-name {message, service-name: service.name, internal-namespace: @routing[service.name].internal-namespace}
-      @subscribers[external-message] or= []
-      @subscribers[external-message].push do
+      (@subscribers[external-message] or= []).push do
         name: service.name
         internal-namespace: @routing[service.name].internal-namespace
 
