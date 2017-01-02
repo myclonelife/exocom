@@ -51,13 +51,13 @@ class ExoCom extends EventEmitter
   # registers the service with the given data
   # as a sender and receiver of messages
   register-service: (routing-config) ~>
-    @client-registry.register-service routing-config
+    @client-registry.register-client routing-config
     'success'
 
   # deregisters a service with the given data
   # as a sender and receiver of messages
   deregister-service: (service-name) ~>
-    @client-registry.deregister-service service-name
+    @client-registry.deregister-client service-name
     'success'
 
   # sends the given message to all subscribers of it.

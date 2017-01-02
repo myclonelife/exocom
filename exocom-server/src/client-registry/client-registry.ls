@@ -47,7 +47,7 @@ class ClientRegistry
 
 
   # Adds service routing configurations to the given setup
-  register-service: (service) ->
+  register-client: (service) ->
     @clients[service.name] =
       name: service.name
       internal-namespace: @routing[service.name].internal-namespace
@@ -59,7 +59,7 @@ class ClientRegistry
         internal-namespace: @routing[service.name].internal-namespace
 
 
-  deregister-service: (service-name) ->
+  deregister-client: (service-name) ->
     for message in (@routing[service-name].receives or {})
       external-message = @external-message-name {message, service-name, internal-namespace: @clients[service-name].internal-namespace}
       delete @subscribers[external-message]
