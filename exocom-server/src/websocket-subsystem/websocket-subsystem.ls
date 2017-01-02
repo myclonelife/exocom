@@ -19,6 +19,13 @@ class WebSocketSubsystem extends EventEmitter
     @port = null
 
     # Stores the service names and respective web socket
+    #
+    # format:
+    # {
+    #   'client 1 name': websocket,
+    #   'client 2 name': websocket,
+    #   ...
+    # }
     @service-sockets = {}
 
 
