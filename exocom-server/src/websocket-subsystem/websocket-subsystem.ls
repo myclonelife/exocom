@@ -47,7 +47,7 @@ class WebSocketSubsystem extends EventEmitter
     @server = new WebSocketServer {server, path: '/services'}
       ..on 'connection', @on-connection
       ..on 'listening', ~> @emit 'online', @port
-      ..on 'error', (error) ~> @emit 'error', error
+      ..on 'error', (err) ~> @emit 'error', err
 
 
   # called when a new service instance connects
