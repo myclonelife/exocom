@@ -9,8 +9,9 @@ debug = require('debug')('exocom:websocket-subsystem')
 # The web sockets endpoint that listens/sends messages from/to services
 #
 # Emits these events:
-# - error: when it cannot bind to the given port
 # - online: when it is online and ready to go
+# - error: for critical issues
+# - warn: for non-critical issues
 class WebSocketSubsystem extends EventEmitter
 
   (@exocom) ->

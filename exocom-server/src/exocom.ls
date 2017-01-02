@@ -14,14 +14,19 @@ debug = require('debug')('exocom')
 class ExoCom extends EventEmitter
 
   ({@service-messages} = {}) ->
+
     @client-registry    = new ClientRegistry {@service-messages}
+
     @http-subsystem = new HttpSubsystem @
       ..on 'online', (port) ~> @emit 'http-online', port
+
     @message-cache = new MessageCache!
+
     @websocket = new WebSocketSubsystem @
       ..on 'online', (port) ~> @emit 'websockets-online', port
 
-    delegate-event 'websocket-bound' 'error', 'warn', from: @websocket, to: @
+    delegate-event 'error', 'warn' from: @websocket, to: @
+    delegate-event 'error' from: @http-subsystem, to: @
 
 
   # returns the current configuration of this ExoCom instance
