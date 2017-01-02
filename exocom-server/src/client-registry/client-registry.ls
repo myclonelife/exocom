@@ -7,10 +7,10 @@ require! {
 
 class ClientRegistry
 
-  ({@service-messages = '{}'} = {}) ->
+  ({service-messages = '{}'} = {}) ->
 
     # List of messages that are received by the applications services
-    @routing = {[service.name, {receives: service.receives, sends: service.sends, internal-namespace: service.namespace}] for service in jsonic(@service-messages)}
+    @routing = {}
 
     # List of clients that are currently registered
     #
@@ -34,6 +34,16 @@ class ClientRegistry
     #   'message 2 name':
     #     ...
     @routes = {}
+
+    @_set-routing service-messages
+
+
+  _set-routing: (routing-data) ->
+    for service in jsonic(routing-data)
+      @routing[service.name] =
+        receives: service.receives,
+        sends: service.sends,
+        internal-namespace: service.namespace
 
 
   reset: ->
