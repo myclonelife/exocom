@@ -19,6 +19,7 @@ class ExoCom extends EventEmitter
       ..on 'online', (port) ~> @emit 'http-online', port
     @message-cache = new MessageCache!
     @websocket = new WebSocketSubsystem @
+      ..on 'online', (port) ~> @emit 'websockets-online', port
 
     delegate-event 'websocket-bound' 'error', 'warn', from: @websocket, to: @
 
@@ -85,7 +86,7 @@ class ExoCom extends EventEmitter
 
     # send the message to the subscribers
     debug "sending '#{message-data.name}' to #{subscriber-names}"
-    sent-messages = @websocket.send-to-services message-data, subscribers
+    sent-messages = @websocket.send-message-to-services message-data, subscribers
     @emit 'message', messages: sent-messages, receivers: subscriber-names
 
     'success'
