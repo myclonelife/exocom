@@ -75,7 +75,7 @@ class ClientRegistry
   _parse-service-messages: (service-messages) ->
     result = {}
     for service in jsonic(service-messages)
-      result[service.name] =
+      result[service.service-type] =
         receives: service.receives
         sends: service.sends
         internal-namespace: service.namespace
