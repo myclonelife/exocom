@@ -15,7 +15,7 @@ class ExoCom extends EventEmitter
 
   ({@service-messages} = {}) ->
 
-    @client-registry    = new ClientRegistry {@service-messages}
+    @client-registry = new ClientRegistry {@service-messages}
 
     @http-subsystem = new HttpSubsystem @
       ..on 'online', (port) ~> @emit 'http-online', port
