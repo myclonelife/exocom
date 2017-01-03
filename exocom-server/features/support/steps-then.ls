@@ -24,6 +24,10 @@ module.exports = ->
     @verify-service-setup services, done
 
 
+  @Then /^ExoCom replies with an? "([^"]*)" message$/ (message-name, done) ->
+    @verify-sent-calls {@service, message-name, response-to: @service.last-sent-message.id}, done
+
+
   @Then /^ExoCom signals "([^"]*)"$/, (message, done) ->
     @verify-exocom-signaled-string message, done
 

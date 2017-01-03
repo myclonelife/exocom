@@ -69,15 +69,16 @@ class WebSocketSubsystem extends EventEmitter
     request-data = @_parse-request JSON.parse(message)
     @_log-received request-data
     switch
-      | request-data.name is \exocom.register-service           =>  @on-service-instance-registration request-data.payload, websocket
+      | request-data.name is \exocom.register-service           =>  @on-service-instance-registration request-data, websocket
       | @invalid-sender request-data.sender, request-data.name  =>  @emit 'error', "Service '#{request-data.sender}' is not allowed to broadcast the message '#{request-data.name}'"
       | otherwise                                               =>  @on-normal-message-receive request-data
 
 
   # called when a service instance registers itself with Exocom
-  on-service-instance-registration: (payload, websocket) ->
-    @exocom.register-client payload, websocket
-    @register-client service-name: payload.name, websocket: websocket
+  on-service-instance-registration: (message, websocket) ->
+    console.log 1111 message
+    @register-client service-name: message.payload.name, websocket: websocket
+    @exocom.register-client message, websocket
 
 
   # called when a service instance sends a normal message
@@ -93,20 +94,17 @@ class WebSocketSubsystem extends EventEmitter
 
   send-message-to-services: (message-data, services) ->
     for service in services
-      @send-message-to-service message-data, service
+      @send-message-to-service service, message-data
 
 
-  send-message-to-service: (message-data, service) ->
-    translated-message-name = @_translate message-data.name, for: service
-    request-data =
-      name: translated-message-name
-      id: message-data.id
-      payload: message-data.payload
-      timestamp: message-data.timestamp
-    if message-data.response-to
-      request-data.response-time = message-data.response-time
-      request-data.response-to = message-data.response-to
-    @_log-sending message-data, service
+  send-message-to-service: (service, {name, id, payload, timestamp, response-to, response-time}) ->
+    translated-message-name = @_translate name, for: service
+
+    request-data = {name: translated-message-name, id, payload, timestamp}
+    if response-to
+      request-data.response-time = response-time
+      request-data.response-to = response-to
+    @_log-sending {name, id, response-to}, service
     @sockets[service.name].send JSON.stringify request-data
     result = {[key, value] for key, value of message-data}
     result.name = translated-message-name

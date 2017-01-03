@@ -6,6 +6,7 @@ require! {
   'nanoseconds'
   'process'
   'rails-delegate' : {delegate, delegate-event}
+  'uuid'
   './websocket-subsystem/websocket-subsystem' : WebSocketSubsystem
 }
 debug = require('debug')('exocom')
@@ -51,8 +52,15 @@ class ExoCom extends EventEmitter
 
   # registers the service with the given data
   # as a sender and receiver of messages
-  register-client: (routing-config) ~>
-    @client-registry.register-client routing-config
+  register-client: (message) ~>
+    @client-registry.register-client message.payload
+    console.log message
+    @websocket.send-message-to-service message.payload.service-name,
+      name: 'exocom.registered-service'
+      id: uuid.v4!
+      response-to: message.id
+      response-time: nanoseconds(process.hrtime!) - message.timestamp
+
 
 
   # deregisters a service with the given data

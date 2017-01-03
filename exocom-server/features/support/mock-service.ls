@@ -9,7 +9,12 @@ debug = require('debug')('mock-service')
 class MockService
 
   ({@port, @name, @namespace} = {}) ->
+
+    # list of messages that this mock service has received from Exocom
     @received-messages = []
+
+    # the last message sent to Exocom
+    @last-sent-message = null
 
 
   close: ~>
@@ -18,7 +23,7 @@ class MockService
     @closed = yes
 
 
-  connect: ({payload}, done) ~>
+  connect: ({message-name, payload}, done) ~>
     payload ?= {@name}
     @socket = new WebSocket "ws://localhost:#{@port}/services"
       ..on 'message', @_on-socket-message
@@ -33,6 +38,7 @@ class MockService
 
 
   send: (request-data) ~>
+    @last-sent-message = request-data
     @socket.send JSON.stringify request-data
 
 

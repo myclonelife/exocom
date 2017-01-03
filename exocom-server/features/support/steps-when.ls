@@ -11,8 +11,9 @@ module.exports = ->
   @When /^a new "([^"]*)" service instance registers itself with it via the message:$/ (name, table, done) ->
     table-data = table.raw! |> pairs-to-obj
     payload = table-data.PAYLOAD |> JSON.parse
-    (@service-mocks or= {})[name] = new MockService name: table-data.NAME, port: @exocom-port
-    @service-mocks[name].connect {payload}, ->
+    @service = new MockService name: name, port: @exocom-port
+    (@service-mocks or= {})[name] = @service
+    @service-mocks[name].connect {name: table.NAME, payload}, ->
       wait 200, done
 
 
