@@ -34,7 +34,7 @@ class SubscriptionManager
 
   remove: (client-name) ->
     for message in (@routing[client-name].receives or {})
-      external-message = @external-message-name {message, client-name, internal-namespace: @clients[client-name].internal-namespace}
+      external-message = @external-message-name {message, client-name, internal-namespace: @subscribers[client-name].internal-namespace}
       # TODO: this is broken, make this remove only the client
       delete @subscribers[external-message]
 
