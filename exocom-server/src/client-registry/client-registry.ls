@@ -14,11 +14,11 @@ class ClientRegistry
     #
     # the format is:
     # {
-    #   'service 1 name':
+    #   'service 1 type':
     #     receives: ['message 1', 'message 2']
     #     sends: ['message 3', 'message 4']
     #     internal-namespace: 'my internal namespace'
-    #   'service 2 name':
+    #   'service 2 type':
     #     ...
     @routing = @_parse-service-messages service-messages
 
@@ -75,7 +75,7 @@ class ClientRegistry
   _parse-service-messages: (service-messages) ->
     result = {}
     for service in jsonic(service-messages)
-      result[service.name] =
+      result[service.service-type] =
         receives: service.receives
         sends: service.sends
         internal-namespace: service.namespace
