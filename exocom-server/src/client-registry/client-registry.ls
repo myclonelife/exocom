@@ -8,7 +8,7 @@ require! {
 
 class ClientRegistry
 
-  ({service-messages = '{}'} = {}) ->
+  ({service-routes = '{}'} = {}) ->
 
     # List of messages that are received by the applications services
     #
@@ -20,7 +20,7 @@ class ClientRegistry
     #     internal-namespace: 'my internal namespace'
     #   'service 2 type':
     #     ...
-    @routing = @_parse-service-messages service-messages
+    @routing = @_parse-service-routes service-routes
 
     # The main list of clients that are currently registered
     #
@@ -72,9 +72,9 @@ class ClientRegistry
     | otherwise                                       =>  message
 
 
-  _parse-service-messages: (service-messages) ->
+  _parse-service-routes: (service-routes) ->
     result = {}
-    for service in jsonic(service-messages)
+    for service in jsonic(service-routes)
       result[service.service-type] =
         receives: service.receives
         sends: service.sends
