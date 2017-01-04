@@ -13,9 +13,9 @@ debug = require('debug')('exocom')
 
 class ExoCom extends EventEmitter
 
-  ({@service-messages} = {}) ->
+  ({service-routes} = {}) ->
 
-    @client-registry = new ClientRegistry {@service-messages}
+    @client-registry = new ClientRegistry {service-routes}
 
     @http-subsystem = new HttpSubsystem @
       ..on 'online', (port) ~> @emit 'http-online', port
