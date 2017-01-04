@@ -14,10 +14,11 @@ More details around configuring the port [here](features/configuring-the-ports.f
 ## Terminology
 
 - there are a number of __service types__, for example the "web" service, the "todo" service, etc
-- each service type has a number of instances. We call them __clients__ of Exocom to avoid the word "service" again
+- each service type has a number of instances. We call them __clients__ of Exocom to avoid the word "service" again.
+- each client has a unique name to identify it, e.g. "web #1"
 - the service configuration file defines which messages a service is allowed to send and receive.
   This information is called __routing__
-- services can send __messages__ to each other.
+- service instances (clients) can send __messages__ to each other.
   A service can only send messages of a __message type__ it is allowed to send,
   which is specified in the routing information.
 

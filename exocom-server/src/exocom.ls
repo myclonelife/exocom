@@ -49,16 +49,14 @@ class ExoCom extends EventEmitter
     debug "Listening at port #{port}"
 
 
-  # registers the service with the given data
-  # as a sender and receiver of messages
-  register-client: (routing-config) ~>
-    @client-registry.register-client routing-config
+  # registers the given service instance that just came online
+  register-client: (client) ~>
+    @client-registry.register-client client
 
 
-  # deregisters a service with the given data
-  # as a sender and receiver of messages
-  deregister-client: (service-name) ~>
-    @client-registry.deregister-client service-name
+  # deregisters a service instance that went offline
+  deregister-client: (client-name) ~>
+    @client-registry.deregister-client client-name
 
 
   # sends the given message to all subscribers of it.
