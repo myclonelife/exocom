@@ -38,19 +38,20 @@ class ClientRegistry
 
 
 
-  # Adds service routing configurations to the given setup
-  register-client: (service) ->
-    @clients[service.name] =
-      client-name: service.name
-      service-type: service.name
-      internal-namespace: @routing[service.name].internal-namespace
+  # registers the given service instance that just came online
+  register-client: (client) ->
+    @clients[client.name] =
+      client-name: client.name
+      service-type: client.name
+      internal-namespace: @routing[client.name].internal-namespace
 
-    @subscriptions.add-all client-name: service.name, service-type: service.name
+    @subscriptions.add-all client-name: client.name, service-type: client.name
 
 
-  deregister-client: (service-name) ->
-    @subscriptions.remove service-name
-    delete @clients[service-name]
+  # deregisters a service instance that went offline
+  deregister-client: (client-name) ->
+    @subscriptions.remove client-name
+    delete @clients[client-name]
 
 
   # Returns the clients that are subscribed to the given message
