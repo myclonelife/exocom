@@ -11,6 +11,17 @@ The default port is 3100.
 More details around configuring the port [here](features/configuring-the-ports.feature).
 
 
+## Terminology
+
+- there are a number of __service types__, for example the "web" service, the "todo" service, etc
+- each service type has a number of instances. We call them __clients__ of Exocom to avoid the word "service" again
+- the service configuration file defines which messages a service is allowed to send and receive.
+  This information is called __routing__
+- services can send __messages__ to each other.
+  A service can only send messages of a __message type__ it is allowed to send,
+  which is specified in the routing information.
+
+
 ## Architecture
 
 ExoCom is implemented using the _micro-kernel_ pattern:
