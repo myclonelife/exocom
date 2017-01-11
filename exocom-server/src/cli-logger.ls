@@ -6,36 +6,24 @@ require! {
 # Logs events in a human-friedly format to the CLI
 class CliLogger
 
-  log: (text) ~>
-    console.log text
-
-
-  write: (text) ~>
-    process.stdout.write text
-
-
-  log-header: (text) ->
-    @log dim text
-
-
-  log-websockets-online: (port) ~>
-    @log "ExoCom WebSocket listener online at port #{cyan port}"
-
-
-  log-http-online: (port) ~>
-    @log "ExoCom HTTP service online at port #{magenta port}"
-
-
-  log-error: (err) ~>
+  # logs the given critical error message
+  error: (err) ~>
     @log red "Error: #{err}"
     process.exit 1
 
 
-  log-warn: (warning) ~>
-    @log yellow "Warning: #{warning}"
+  # writes information about the application that comes before the actual application output
+  header: (text) ->
+    @log dim text
 
 
-  log-message: ({messages, receivers}) ~>
+  # writes the given text to stdout with newline
+  log: (text) ~>
+    console.log text
+
+
+  # logs that messages were sent over the bus
+  messages: ({messages, receivers}) ~>
     for message in messages
       response-time = ''
       if message.response-to
@@ -47,13 +35,23 @@ class CliLogger
       @log message.payload
 
 
-  log-routing-setup: ~>
+  routing-setup: ~>
     @log 'receiving routing setup:'
     for command, routing of exocom.client-registry.routes
       @write "  --[ #{command} ]-> "
       text = for receiver in routing.receivers
-        "#{receiver.name}"
+        "#{receiver.client-name}"
       @write "#{text.join ' + '}\n"
+
+
+  # logs the given warning message
+  warning: (warning) ~>
+    @log yellow "Warning: #{warning}"
+
+
+  # writes the given text to stdout without newline
+  write: (text) ~>
+    process.stdout.write text
 
 
 

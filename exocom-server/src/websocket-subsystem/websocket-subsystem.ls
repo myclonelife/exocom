@@ -1,4 +1,5 @@
 require! {
+  'chalk' : {cyan}
   'events' : {EventEmitter}
   '../message-cache/message-cache' : MessageCache
   'ws' : {Server: WebSocketServer}
@@ -14,7 +15,7 @@ debug = require('debug')('exocom:websocket-subsystem')
 # - warn: for non-critical issues
 class WebSocketSubsystem extends EventEmitter
 
-  (@exocom) ->
+  ({@logger} = {}) ->
     @server = null
     @port = null
 
@@ -29,24 +30,15 @@ class WebSocketSubsystem extends EventEmitter
     @sockets = {}
 
 
-  # Registers the given websocket as a connection
-  # to an instance of the service with the given name
-  register-client: ({service-name, websocket}) ->
-    @sockets[service-name] = websocket
-      ..on 'close', ~>
-        @exocom.deregister-client service-name
-        @deregister-client service-name
-
-
-  deregister-client: (service-name) ->
-    @sockets[service-name]?.close!
-    delete @sockets[service-name]
-
-
   close: ->
     | !@server  =>  return
     debug 'websockets going offline'
     @server.close!
+
+
+  deregister-client: (client-name) ->
+    @sockets[client-name]?.close!
+    delete @sockets[client-name]
 
 
   # Listens at the given port
@@ -54,8 +46,10 @@ class WebSocketSubsystem extends EventEmitter
   listen: (@port, server) ->
     @server = new WebSocketServer {server, path: '/services'}
       ..on 'connection', @on-connection
-      ..on 'listening', ~> @emit 'online', @port
-      ..on 'error', (err) ~> @emit 'error', err
+      ..on 'listening', ~>
+        @logger.log "ExoCom WebSocket listener online at port #{cyan port}"
+        @emit 'online', @port
+      ..on 'error', (err) ~> @logger.error err
 
 
   # called when a new service instance connects
@@ -66,12 +60,9 @@ class WebSocketSubsystem extends EventEmitter
 
   # called when a new message from a service instance arrives
   on-message: (message, websocket) ->
-    request-data = @_parse-request JSON.parse(message)
-    @_log-received request-data
-    switch
-      | request-data.name is \exocom.register-service           =>  @on-service-instance-registration request-data, websocket
-      | @invalid-sender request-data.sender, request-data.name  =>  @emit 'error', "Service '#{request-data.sender}' is not allowed to broadcast the message '#{request-data.name}'"
-      | otherwise                                               =>  @on-normal-message-receive request-data
+      message = JSON.parse message-text
+      @_log-received message
+      @emit 'message', {message, websocket}
 
 
   # called when a service instance registers itself with Exocom
@@ -81,60 +72,38 @@ class WebSocketSubsystem extends EventEmitter
     @exocom.register-client message, websocket
 
 
-  # called when a service instance sends a normal message
-  # i.e. not a registration message
-  on-normal-message-receive: (data) ->
-    switch (result = @exocom.send-message data)
-      | 'success'             =>
-      | 'no receivers'        =>  @emit 'warn', "No receivers for message '#{data.name}' registered"
-      | 'missing request id'  =>  @emit 'error', 'missing request id'
-      | 'unknown message'     =>  @emit 'error', "unknown message: '#{request-data.message}'"
-      | _                     =>  @emit 'error', "unknown result code: '#{@result}'"
+  # Registers the given websocket as a connection
+  # to an instance of the service with the given name
+  register-client: ({client-name, websocket}) ->
+    @sockets[client-name] = websocket
+      ..on 'close', ~> @emit 'deregister-client', client-name
 
 
-  send-message-to-services: (message-data, services) ->
-    for service in services
-      @send-message-to-service service, message-data
-
-
-  send-message-to-service: (service, {name, id, payload, timestamp, response-to, response-time}) ->
-    translated-message-name = @_translate name, for: service
-
-    request-data = {name: translated-message-name, id, payload, timestamp}
-    if response-to
-      request-data.response-time = response-time
-      request-data.response-to = response-to
-    @_log-sending {name, id, response-to}, service
+  send-message-to-service: (service, message) ->
+    internal-message-name = @_internal-message-name message.name, for: service
+    request-data =
+      name: internal-message-name
+      id: message.id
+      payload: message.payload
+      timestamp: message.timestamp
+    if message.response-to
+      request-data.response-time = message.response-time
+      request-data.response-to = message.response-to
+    @_log-sending message, service
     @sockets[service.name].send JSON.stringify request-data
-    result = {[key, value] for key, value of message-data}
-    result.name = translated-message-name
+    result = {[key, value] for key, value of message}
+    result.name = internal-message-name
     result
 
 
-  _log-received: ({name, id, response-to}) ->
-    | response-to  =>  debug "received '#{name}' with id '#{id}' in response to '#{response-to}'"
-    | _            =>  debug "received '#{name}' with id '#{id}'"
 
-
-  _log-sending: ({name, id, response-to}, service) ->
-    | response-to  =>  debug "sending '#{name}' with id '#{id}' in response to '#{response-to}' to '#{service.name}'"
-    | _            =>  debug "sending '#{name}' with id '#{id}' to '#{service.name}'"
-
-
-  # Returns the relevant data from a request
-  _parse-request: (req) ~>
-    {
-      sender: req.sender
-      name: req.name
-      payload: req.payload
-      response-to: req.response-to
-      timestamp: req.timestamp
-      id: req.id
-    }
+  send-message-to-services: (message, services) ->
+    for service in services
+      @send-message-to-service service, message
 
 
   # Translates outgoing message into one that the receiving service will understand
-  _translate: (message-name, {for: service}) ->
+  _internal-message-name: (message-name, {for: service}) ->
     message-parts = message-name.split '.'
     switch
       | !service.internal-namespace                     =>  message-name
@@ -143,8 +112,14 @@ class WebSocketSubsystem extends EventEmitter
       | otherwise                                       => "#{service.internal-namespace}.#{message-parts[1]}"
 
 
-  invalid-sender: (sender, message) ->
-    !@exocom.client-registry.can-send sender, message
+  _log-received: (message) ->
+    | message.response-to  =>  debug "received '#{message.name}' with id '#{message.id}' in response to '#{message.response-to}'"
+    | _                    =>  debug "received '#{message.name}' with id '#{message.id}'"
+
+
+  _log-sending: (message, service) ->
+    | message.response-to  =>  debug "sending '#{message.name}' with id '#{message.id}' in response to '#{message.response-to}' to '#{service.name}'"
+    | _                    =>  debug "sending '#{message.name}' with id '#{message.id}' to '#{service.name}'"
 
 
 

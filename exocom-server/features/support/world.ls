@@ -25,9 +25,9 @@ World = !->
       ..wait "WebSocket listener online at port #{@port}", done
 
 
-  @create-mock-service-at-port = ({name, port, namespace}, done) ->
-    (@service-mocks or= {})[name] = new MockService {port, name, namespace}
-    @service-mocks[name].connect {}, ->
+  @create-mock-service-at-port = ({client-name, port, namespace}, done) ->
+    (@service-mocks or= {})[client-name] = new MockService {port, client-name, namespace}
+    @service-mocks[client-name].connect {}, ->
       wait 200, done
 
 
@@ -38,47 +38,47 @@ World = !->
     done!
 
 
-  @service-sends-message = ({service, message}, done) ->
+  @service-sends-message = ({service-name, message-name}, done) ->
     request-data =
-      sender: service
+      sender: service-name
       payload: ''
       id: '123'
-      name: message
-    @service-mocks[service].send request-data
+      name: message-name
+    @service-mocks[service-name].send request-data
     done!
 
 
-  @service-sends-reply = ({service, message, response-to}, done) ->
+  @service-sends-reply = ({service-name, message-name, response-to}, done) ->
     request-data =
-      sender: service
+      sender: service-name
       payload: ''
       id: '123'
       response-to: response-to
-      name: message
-    @service-mocks[service].send request-data
+      name: message-name
+    @service-mocks[service-name].send request-data
     done!
 
 
-  @verify-abort-with-message = (message, done) ->
-    @process.wait message, ~>
+  @verify-abort-with-notification = (text, done) ->
+    @process.wait text, ~>
       wait-until (~> @process.ended), done
 
 
-  @verify-exocom-broadcasted-message = ({message, sender, receivers}, done) ->
-    @process.wait "#{sender} is broadcasting '#{message}' to the #{receivers.join ', '}", done
+  @verify-exocom-broadcasted-message = ({message-name, sender, receivers}, done) ->
+    @process.wait "#{sender} is broadcasting '#{message-name}' to the #{receivers.join ', '}", done
 
 
-  @verify-exocom-signaled-string = (message, done) ->
-    [...message-main, response-time-msg] = message.split '  '
-    @process.wait "#{message-main.join '  '}  ", done
+  @verify-exocom-signaled-string = (text, done) ->
+    [...main-parts, response-time-msg] = text.split '  '
+    @process.wait "#{main-parts.join '  '}  ", done
 
 
-  @verify-exocom-received-message = (message, done) ->
-    @process.wait "broadcasting '#{message}'", done
+  @verify-exocom-received-message = (message-name, done) ->
+    @process.wait "broadcasting '#{message-name}'", done
 
 
-  @verify-exocom-received-reply = (message, done) ->
-    @process.wait "broadcasting '#{message}'", done
+  @verify-exocom-received-reply = (message-name, done) ->
+    @process.wait "broadcasting '#{message-name}'", done
 
 
   @verify-routing-setup = (expected-routing, done) ->
@@ -93,12 +93,12 @@ World = !->
     messages.push "WebSocket listener online at port #{port}" if port
     messages.push "HTTP service online at port #{port}" if port
     async.each messages,
-               ((message, cb) ~> @process.wait message, cb),
+               ((text, cb) ~> @process.wait text, cb),
                done
 
 
-  @verify-sent-calls = ({service, service-name, message-name, id = '123', response-to}, done) ->
-    service = @service-mocks[service-name] if service-name
+  @verify-sent-calls = ({service, client-name, message-name, id = '123', response-to}, done) ->
+    service = @service-mocks[client-name] if service-name
     wait-until (~> service.received-messages[0]?.name is message-name), 1, ~>
       expected =
         name: message-name

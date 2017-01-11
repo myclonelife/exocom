@@ -6,12 +6,12 @@ require! {
 
 module.exports = ->
 
-  @Then /^ExoCom broadcasts the message "([^"]*)" to the "([^"]+)" service$/, (message-name, service-name, done) ->
-    @verify-sent-calls {service-name, message-name, id: @last-sent-message-id}, done
+  @Then /^ExoCom broadcasts the message "([^"]*)" to the "([^"]+)" service$/, (message-name, client-name, done) ->
+    @verify-sent-calls {client-name, message-name, id: @last-sent-message-id}, done
 
 
-  @Then /^ExoCom broadcasts the reply "([^"]*)" to the "([^"]+)" service$/, (message-name, service-name, done) ->
-    @verify-sent-calls {service-name, message-name, response-to: '111'}, done
+  @Then /^ExoCom broadcasts the reply "([^"]*)" to the "([^"]+)" service$/, (message-name, client-name, done) ->
+    @verify-sent-calls {client-name, message-name, response-to: '111'}, done
 
 
   @Then /^ExoCom now knows about these service instances:$/ (table, done) ->
@@ -28,28 +28,28 @@ module.exports = ->
     @verify-sent-calls {@service, message-name, response-to: @service.last-sent-message.id}, done
 
 
-  @Then /^ExoCom signals "([^"]*)"$/, (message, done) ->
-    @verify-exocom-signaled-string message, done
+  @Then /^ExoCom signals "([^"]*)"$/, (message-name, done) ->
+    @verify-exocom-signaled-string message-name, done
 
 
   @Then /^ExoCom signals that this message was sent$/, (done) ->
-    @verify-exocom-broadcasted-message message: @last-sent-message, done
+    @verify-exocom-broadcasted-message message: @last-sent-message-name, done
 
 
   @Then /^ExoCom signals that this reply is sent from the ([^ ]+) to the (.+)$/, (sender, receiver, done) ->
-    @verify-exocom-broadcasted-message message: @last-sent-message, sender: sender, receivers: [receiver], response-to: '111', done
+    @verify-exocom-broadcasted-message message: @last-sent-message-name, sender: sender, receivers: [receiver], response-to: '111', done
 
 
   @Then /^ExoCom signals that this reply was sent$/, (done) ->
-    @verify-exocom-broadcasted-reply @last-sent-message, done
+    @verify-exocom-broadcasted-reply @last-sent-message-name, done
 
 
-  @Then /^ExoCom signals the error "([^"]*)"$/, (message, done) ->
-    @process.wait message, done
+  @Then /^ExoCom signals the error "([^"]*)"$/, (error-text, done) ->
+    @process.wait error-text, done
 
 
-  @Then /^it aborts with the message "([^"]*)"$/, (message, done) ->
-    @verify-abort-with-message message, done
+  @Then /^it aborts with the message "([^"]*)"$/, (text, done) ->
+    @verify-abort-with-notification text, done
 
 
   @Then /^it has this routing table:$/, (table, done) ->

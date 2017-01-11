@@ -15,8 +15,8 @@ class ClientRegistry
     # the format is:
     # {
     #   'role 1':
-    #     receives: ['message 1', 'message 2']
-    #     sends: ['message 3', 'message 4']
+    #     receives: ['message 1 name', 'message 2 name']
+    #     sends: ['message 3 name', 'message 4 name']
     #     internal-namespace: 'my internal namespace'
     #   'role 2':
     #     ...
@@ -37,15 +37,9 @@ class ClientRegistry
     @subscriptions = new SubscriptionManager @routing
 
 
-
-  # registers the given service instance that just came online
-  register-client: (client) ->
-    @clients[client.name] =
-      client-name: client.name
-      service-type: client.name
-      internal-namespace: @routing[client.name].internal-namespace
-
-    @subscriptions.add-all client-name: client.name, service-type: client.name
+  # returns whether the given sender is allowed to send messages with the given name
+  can-send: (sender-name, message-name) ->
+    @routing[sender-name].sends |> (.includes message-name)
 
 
   # deregisters a service instance that went offline
@@ -54,23 +48,30 @@ class ClientRegistry
     delete @clients[client-name]
 
 
+  # Returns the external name for the given message sent by the given service,
+  # i.e. how the sent message should appear to the other services.
+  outgoing-message-name: (message-name, service) ->
+    message-parts = message-name.split '.'
+    switch
+    | message-parts.length is 1                       =>  message-name
+    | message-parts[0] is service.internal-namespace  =>  "#{service.service-type}.#{message-parts[1]}"
+    | otherwise                                       =>  message-name
+
+
+  # registers the given service instance that just came online
+  register-client: (client) ->
+    @clients[client.client-name] =
+      client-name: client.client-name
+      service-type: client.client-name
+      internal-namespace: @routing[client.client-name].internal-namespace
+
+    @subscriptions.add-all {client-name: client.client-name, service-type: client.client-name}
+
+
   # Returns the clients that are subscribed to the given message
   subscribers-for: (message-name) ->
     @subscriptions.subscribers-for message-name
 
-
-  can-send: (sender, message) ->
-    @routing[sender].sends |> (.includes message)
-
-
-  # Returns the external name for the given message sent by the given service,
-  # i.e. how the sent message should appear to the other services.
-  outgoing-message-name: (message, service) ->
-    message-parts = message.split '.'
-    switch
-    | message-parts.length is 1                       =>  message
-    | message-parts[0] is service.internal-namespace  =>  "#{service.service-type}.#{message-parts[1]}"
-    | otherwise                                       =>  message
 
 
   _parse-service-routes: (service-routes) ->
