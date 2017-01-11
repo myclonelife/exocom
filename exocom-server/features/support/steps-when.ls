@@ -8,11 +8,11 @@ require! {
 
 module.exports = ->
 
-  @When /^a new "([^"]*)" service instance registers itself with it via the message:$/ (name, table, done) ->
+  @When /^a new "([^"]*)" service instance registers itself with it via the message:$/ (client-name, table, done) ->
     table-data = table.raw! |> pairs-to-obj
     payload = table-data.PAYLOAD |> JSON.parse
-    (@service-mocks or= {})[name] = new MockService name: table-data.NAME, port: @exocom-port
-    @service-mocks[name].connect {payload}, ->
+    (@service-mocks or= {})[client-name] = new MockService name: table-data.NAME, port: @exocom-port
+    @service-mocks[client-name].connect {payload}, ->
       wait 200, done
 
 
@@ -34,16 +34,16 @@ module.exports = ->
     @set-service-landscape config, done
 
 
-  @When /^the "([^"]*)" service goes offline$/ (service-name, done) ->
-    @service-mocks[service-name].close!
+  @When /^the "([^"]*)" service goes offline$/ (client-name, done) ->
+    @service-mocks[client-name].close!
     wait 200, done
 
 
-  @When /^the "([^"]+)" service sends "([^"]*)"$/, (service, message, done) ->
-    @last-sent-message = message
-    @service-sends-message {service, message}, done
+  @When /^the "([^"]+)" service sends "([^"]*)"$/, (service-name, message-name, done) ->
+    @last-sent-message = message-name
+    @service-sends-message {service-name, message-name}, done
 
 
-  @When /^the "([^"]+)" service sends "([^"]*)" in reply to "([^"]*)"$/, (service, reply-message, response-to, done) ->
-    @last-sent-message = reply-message
-    @service-sends-reply {service, message: reply-message, response-to}, done
+  @When /^the "([^"]+)" service sends "([^"]*)" in reply to "([^"]*)"$/, (service-name, reply-message, response-to, done) ->
+    @last-sent-message-name = reply-message
+    @service-sends-reply {service-name, message-name: reply-message, response-to}, done

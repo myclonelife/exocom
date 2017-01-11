@@ -18,29 +18,18 @@ class SubscriptionManager
     @subscribers = {}
 
 
-  # adds subscriptions for the client with the given name
-  add-all: ({client-name, service-type}) ->
-    for internal-message in @routing[service-type].receives or {}
-      @add {internal-message, client-name}
-
-
   # Adds the given client to the subscription list for the given message
-  add: ({internal-message, client-name}) ->
-    external-message-name = @external-message-name {internal-message, service-name: client-name, internal-namespace: @routing[client-name].internal-namespace}
-    (@subscribers[external-message-name] or= []).push do
-      name: client-name
+  add: ({internal-message-name, client-name}) ->
+    public-message-name = @public-message-name {internal-message-name, client-name, internal-namespace: @routing[client-name].internal-namespace}
+    (@subscribers[public-message-name] or= []).push do
+      client-name: client-name
       internal-namespace: @routing[client-name].internal-namespace
 
 
-  remove: (client-name) ->
-    for message in (@routing[client-name].receives or {})
-      external-message = @external-message-name {message, client-name, internal-namespace: @subscribers[client-name].internal-namespace}
-      # TODO: this is broken, make this remove only the client
-      delete @subscribers[external-message]
-
-
-  subscribers-for: (message-name) ->
-    @subscribers[message-name]
+  # adds subscriptions for the client with the given name
+  add-all: ({client-name, service-type}) ->
+    for internal-message-name in @routing[service-type].receives or {}
+      @add {internal-message-name, client-name}
 
 
   # Returns the message name to which the given service would have to subscribe
@@ -50,13 +39,24 @@ class SubscriptionManager
   # - service "tweets" has internal namespace "text-snippets"
   # - it only knows the "text-snippets.create" message
   # - the external message name that it has to subscribe to is "tweets.create"
-  external-message-name: ({internal-message, service-name, internal-namespace}) ->
-    message-parts = internal-message.split '.'
+  public-message-name: ({internal-message-name, client-name, internal-namespace}) ->
+    message-parts = internal-message-name.split '.'
     switch
-    | !internal-namespace               =>  internal-message
-    | message-parts.length is 1         =>  internal-message
-    | message-parts[0] is service-name  =>  internal-message
-    | otherwise                         =>  "#{service-name}.#{message-parts[1]}"
+    | !internal-namespace              =>  internal-message-name
+    | message-parts.length is 1        =>  internal-message-name
+    | message-parts[0] is client-name  =>  internal-message-name
+    | otherwise                        =>  "#{client-name}.#{message-parts[1]}"
+
+
+  remove: (client-name) ->
+    for internal-message-name in (@routing[client-name].receives or {})
+      public-message-name = @public-message-name {internal-message-name, client-name, internal-namespace: @subscribers[client-name].internal-namespace}
+      # TODO: this is broken, make this remove only the client
+      delete @subscribers[public-message-name]
+
+
+  subscribers-for: (message-name) ->
+    @subscribers[message-name]
 
 
 

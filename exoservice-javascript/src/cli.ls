@@ -1,15 +1,16 @@
 require! {
   \chalk : {cyan, dim, green, red}
+  'fs'
+  'js-yaml' : yaml
   'path'
-  'require-yaml'
   './exo-service' : ExoService
+  '../package.json' : exo-js-data
 }
 
-exo-js-data = require path.join(__dirname, '..', 'package.json')
 console.log dim "Exosphere Node.js service runner #{exo-js-data.version}\n"
 
-service-data = require path.resolve('./service.yml')
-console.log "Running #{green process.env.SERVICE_NAME}\n"
+service-data = yaml.safe-load fs.read-file-sync(path.resolve('./service.yml'), 'utf8')
+console.log "Running #{green process.env.ROLE}\n"
 
 
 new ExoService parse-options!
@@ -24,5 +25,5 @@ new ExoService parse-options!
 function parse-options
   exocom-host: process.env.EXOCOM_HOST ? "localhost"
   exocom-port: process.env.EXOCOM_PORT
-  service-name: process.env.SERVICE_NAME
+  role: process.env.ROLE
   internal-namespace: service-data.namespace
