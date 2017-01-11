@@ -14,7 +14,7 @@ Feature: Manage new instances of services
       """
       [
         {
-          "serviceType": "users",
+          "role": "users",
           "namespace": "foo"
         }
       ]
@@ -33,11 +33,11 @@ Feature: Manage new instances of services
     """
     [
       {
-      "serviceType": "users",
+      "role": "users",
       "namespace": "foo"
       },
       {
-      "serviceType": "tweets",
+      "role": "tweets",
       "namespace": "bar"
       }
     ]

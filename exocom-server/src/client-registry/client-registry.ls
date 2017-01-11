@@ -8,19 +8,19 @@ require! {
 
 class ClientRegistry
 
-  ({service-messages = '{}'} = {}) ->
+  ({service-routes = '{}'} = {}) ->
 
     # List of messages that are received by the applications services
     #
     # the format is:
     # {
-    #   'service 1 type':
+    #   'role 1':
     #     receives: ['message 1', 'message 2']
     #     sends: ['message 3', 'message 4']
     #     internal-namespace: 'my internal namespace'
-    #   'service 2 type':
+    #   'role 2':
     #     ...
-    @routing = @_parse-service-messages service-messages
+    @routing = @_parse-service-routes service-routes
 
     # The main list of clients that are currently registered
     #
@@ -38,19 +38,20 @@ class ClientRegistry
 
 
 
-  # Adds service routing configurations to the given setup
-  register-client: (service) ->
-    @clients[service.name] =
-      client-name: service.name
-      service-type: service.name
-      internal-namespace: @routing[service.name].internal-namespace
+  # registers the given service instance that just came online
+  register-client: (client) ->
+    @clients[client.name] =
+      client-name: client.name
+      service-type: client.name
+      internal-namespace: @routing[client.name].internal-namespace
 
-    @subscriptions.add-all client-name: service.name, service-type: service.name
+    @subscriptions.add-all client-name: client.name, service-type: client.name
 
 
-  deregister-client: (service-name) ->
-    @subscriptions.remove service-name
-    delete @clients[service-name]
+  # deregisters a service instance that went offline
+  deregister-client: (client-name) ->
+    @subscriptions.remove client-name
+    delete @clients[client-name]
 
 
   # Returns the clients that are subscribed to the given message
@@ -72,13 +73,13 @@ class ClientRegistry
     | otherwise                                       =>  message
 
 
-  _parse-service-messages: (service-messages) ->
+  _parse-service-routes: (service-routes) ->
     result = {}
-    for service in jsonic(service-messages)
-      result[service.service-type] =
-        receives: service.receives
-        sends: service.sends
-        internal-namespace: service.namespace
+    for service-route in jsonic(service-routes)
+      result[service-route.role] =
+        receives: service-route.receives
+        sends: service-route.sends
+        internal-namespace: service-route.namespace
     result
 
 

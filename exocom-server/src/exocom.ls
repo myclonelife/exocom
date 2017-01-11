@@ -14,9 +14,9 @@ debug = require('debug')('exocom')
 
 class ExoCom extends EventEmitter
 
-  ({@service-messages} = {}) ->
+  ({service-routes} = {}) ->
 
-    @client-registry = new ClientRegistry {@service-messages}
+    @client-registry = new ClientRegistry {service-routes}
 
     @http-subsystem = new HttpSubsystem @
       ..on 'online', (port) ~> @emit 'http-online', port
@@ -62,11 +62,9 @@ class ExoCom extends EventEmitter
       response-time: nanoseconds(process.hrtime!) - message.timestamp
 
 
-
-  # deregisters a service with the given data
-  # as a sender and receiver of messages
-  deregister-client: (service-name) ~>
-    @client-registry.deregister-client service-name
+  # deregisters a service instance that went offline
+  deregister-client: (client-name) ~>
+    @client-registry.deregister-client client-name
 
 
   # sends the given message to all subscribers of it.
