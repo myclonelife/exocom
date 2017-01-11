@@ -4,18 +4,18 @@ require! {
 debug = require('debug')('mock-websocket-endpoint')
 
 
-# Sends and receives WebSocket messages in tests
-class WebSocketEndpoint
+# A programmable Exorelay mock for testing MockExocom
+class MockExorelay
 
   (@name) ->
     @received-messages = []
     @socket = null
 
 
-  connect: (@exocom-port, done) ~>
+  connect: ({@exocom-port, registration-message, registration-payload}, done) ~>
     @socket = new WebSocket "ws://localhost:#{@exocom-port}"
       ..on 'error', @_on-socket-error
-      ..on 'open', ~> @_on-socket-open! ; done!
+      ..on 'open', ~> @register {message-name: registration-message, payload: registration-payload} ; done!
       ..on 'message', @_on-socket-message
 
 
@@ -23,8 +23,16 @@ class WebSocketEndpoint
     @socket?.close!
 
 
+  register: ({message-name = 'exocom.register-service', payload}) ->
+    @send do
+      name: message-name
+      sender: @name
+      payload: payload
+
+
   send: (request-data) ~>
     @socket.send JSON.stringify request-data
+
 
 
   _on-socket-error: (error) ->
@@ -35,11 +43,5 @@ class WebSocketEndpoint
     @received-messages.push JSON.parse data.to-string!
 
 
-  _on-socket-open: ~>
-    @send do
-      name: \exocom.register-service
-      sender: @name
 
-
-
-module.exports = WebSocketEndpoint
+module.exports = MockExorelay

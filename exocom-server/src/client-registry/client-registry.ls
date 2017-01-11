@@ -2,111 +2,87 @@ require! {
   'jsonic'
   'remove-value'
   'require-yaml'
+  './subscription-manager' : SubscriptionManager
 }
 
 
 class ClientRegistry
 
-  ({@service-messages = '{}'} = {}) ->
+  ({service-routes = '{}'} = {}) ->
 
     # List of messages that are received by the applications services
-    @routing = {[service.name, {receives: service.receives, sends: service.sends, internal-namespace: service.namespace}] for service in jsonic(@service-messages)}
+    #
+    # the format is:
+    # {
+    #   'role 1':
+    #     receives: ['message 1 name', 'message 2 name']
+    #     sends: ['message 3 name', 'message 4 name']
+    #     internal-namespace: 'my internal namespace'
+    #   'role 2':
+    #     ...
+    @routing = @_parse-service-routes service-routes
 
-    # List of clients that are currently registered
+    # The main list of clients that are currently registered
     #
     # The format is:
     # {
     #   'client 1 name':
-    #     name: ...
+    #     client-name: ...
+    #     service-type: ...
     #     namespace: ...
     #   'client 2 name':
     #     ...
     @clients = {}
 
-    # List of clients that are subscribed to the given message
-    #
-    # The format is:
-    # {
-    #   'message 1 name':
-    #     receivers:
-    #       * name: ...
-    #       * name: ...
-    #   'message 2 name':
-    #     ...
-    @routes = {}
+    @subscriptions = new SubscriptionManager @routing
 
 
-  reset: ->
-    @clients = {}
-    @subscribers = {}
+
+  # returns whether the given sender is allowed to send messages with the given name
+  can-send: (sender-name, message-name) ->
+    @routing[sender-name].sends |> (.includes message-name)
 
 
-  # Sets the currently known service landscape to the given setup
-  set-routing-config: (services) ->
-    @reset!
-    for service in services
-      @add-routing-config service
-
-
-  # Adds service routing configurations to the given setup
-  add-routing-config: (service) ->
-    @clients[service.name] =
-      name: service.name
-      internal-namespace: @routing[service.name].internal-namespace
-    for message in (@routing[service.name].receives or {})
-      external-message = @external-message-name {message, service-name: service.name, internal-namespace: @routing[service.name].internal-namespace}
-      @routes[external-message] or= {}
-      @routes[external-message].receivers or= []
-      @routes[external-message].receivers.push do
-        name: service.name
-        internal-namespace: @routing[service.name].internal-namespace
-
-
-  remove-routing-config: ({service-name}) ->
-    for message in (@routing[service-name].receives or {})
-      external-message = @external-message-name {message, service-name, internal-namespace: @clients[service-name].internal-namespace}
-      delete @routes[external-message]
-    delete @clients[service-name]
-
-
-  # Returns the clients that are subscribed to the given message
-  subscribers-to: (message-name) ->
-    | @routes[message-name]  =>  @routes[message-name].receivers
-
-
-  can-send: (sender, message) ->
-    @routing[sender].sends |> (.includes message)
-
-
-  # Returns the message name to which the given service would have to subscribe
-  # if it wanted to receive the given message expressed in its internal form.
-  #
-  # Example:
-  # - service "tweets" has internal namespace "text-snippets"
-  # - it only knows the "text-snippets.create" message
-  # - the external message name that it has to subscribe to is "tweets.create"
-  external-message-name: ({message, service-name, internal-namespace}) ->
-    message-parts = message.split '.'
-    switch
-    | !internal-namespace               =>  message
-    | message-parts.length is 1         =>  message
-    | message-parts[0] is service-name  =>  message
-    | otherwise                         =>  "#{service-name}.#{message-parts[1]}"
+  # deregisters a service instance that went offline
+  deregister-client: (client-name) ->
+    @subscriptions.remove client-name
+    delete @clients[client-name]
 
 
   # Returns the external name for the given message sent by the given service,
   # i.e. how the sent message should appear to the other services.
-  #
-  # Example:
-  # - service "tweets" has internal name "text-snippets"
-  # - it sends the message "text-snippets.created" to exocom
-  # - exocom converts this message to "tweets.created"
-  outgoing-message-name: (message, service) ->
-    message-parts = message.split '.'
+  outgoing-message-name: (message-name, service) ->
+    message-parts = message-name.split '.'
     switch
-    | message-parts.length is 1                       =>  message
-    | message-parts[0] is service.internal-namespace  =>  "#{service.name}.#{message-parts[1]}"
-    | otherwise                                       =>  message
+    | message-parts.length is 1                       =>  message-name
+    | message-parts[0] is service.internal-namespace  =>  "#{service.service-type}.#{message-parts[1]}"
+    | otherwise                                       =>  message-name
+
+
+  # registers the given service instance that just came online
+  register-client: (client) ->
+    @clients[client.client-name] =
+      client-name: client.client-name
+      service-type: client.client-name
+      internal-namespace: @routing[client.client-name].internal-namespace
+
+    @subscriptions.add-all {client.client-name, service-type: client.client-name}
+
+
+  # Returns the clients that are subscribed to the given message
+  subscribers-for: (message-name) ->
+    @subscriptions.subscribers-for message-name
+
+
+
+  _parse-service-routes: (service-routes) ->
+    result = {}
+    for service-route in jsonic(service-routes)
+      result[service-route.role] =
+        receives: service-route.receives
+        sends: service-route.sends
+        internal-namespace: service-route.namespace
+    result
 
 
 

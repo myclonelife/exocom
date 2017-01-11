@@ -14,15 +14,17 @@ Feature: Manage new instances of services
       """
       [
         {
-          "name": "users",
+          "role": "users",
           "namespace": "foo"
         }
       ]
       """
-    And a new "users" service
-    Then ExoCom now knows about these services:
-      | NAME  | INTERNAL NAMESPACE |
-      | users | foo                |
+    When a new "users" service instance registers itself with it via the message:
+      | NAME    | exocom.register-service |
+      | PAYLOAD | { "clientName": "users" }     |
+    Then ExoCom now knows about these service instances:
+      | CLIENT NAME | SERVICE TYPE | INTERNAL NAMESPACE |
+      | users       | users        | foo                |
 
 
   Scenario: deregister a service once it goes offline
@@ -30,11 +32,11 @@ Feature: Manage new instances of services
     """
     [
       {
-      "name": "users",
+      "role": "users",
       "namespace": "foo"
       },
       {
-      "name": "tweets",
+      "role": "tweets",
       "namespace": "bar"
       }
     ]
@@ -42,6 +44,6 @@ Feature: Manage new instances of services
     And a running "users" instance
     And a running "tweets" instance
     When the "tweets" service goes offline
-    Then ExoCom now knows about these services:
-      | NAME  | INTERNAL NAMESPACE |
-      | users | foo                |
+    Then ExoCom now knows about these service instances:
+      | CLIENT NAME | SERVICE TYPE | INTERNAL NAMESPACE |
+      | users       | users        | foo                |

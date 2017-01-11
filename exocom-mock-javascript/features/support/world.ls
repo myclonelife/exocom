@@ -1,6 +1,6 @@
 require! {
   \wait : {wait, wait-until}
-  \../support/websocket-endpoint : WebSocketEndpoint
+  \../support/mock-exorelay : MockExorelay
 }
 
 
@@ -8,13 +8,13 @@ World = !->
 
   @create-websocket-endpoint = (port, done) ->
     | @service  =>  return done!
-    @service = new WebSocketEndpoint
+    @service = new MockExorelay
       ..connect port, done
 
 
-  @create-named-websocket-endpoint = ({name, port}, done) ->
-    @service = new WebSocketEndpoint name
-      ..connect port, ~>
+  @create-named-websocket-endpoint = ({name, exocom-port, registration-message, registration-payload}, done) ->
+    @service = new MockExorelay name
+      ..connect {exocom-port, registration-message, registration-payload}, ~>
           @exocom.wait-until-knows-service name, done
 
 
