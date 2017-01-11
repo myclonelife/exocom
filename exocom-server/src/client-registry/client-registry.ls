@@ -24,18 +24,6 @@ class ClientRegistry
 
     # The main list of clients that are currently registered
     #
-    # the format is:
-    # {
-    #   'client 1 name':
-    #     receives: ['message 1', 'message 2']
-    #     sends: ['message 3', 'message 4']
-    #     internal-namespace: 'my internal namespace'
-    #   'service 2 name':
-    #     ...
-    @routing = @_parse-service-messages service-messages
-
-    # The main list of clients that are currently registered
-    #
     # The format is:
     # {
     #   'client 1 name':
