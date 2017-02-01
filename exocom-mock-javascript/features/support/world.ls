@@ -1,4 +1,5 @@
 require! {
+  \chai : {expect}
   \wait : {wait, wait-until}
   \../support/mock-exorelay : MockExorelay
 }
@@ -30,8 +31,8 @@ World = !->
   @verify-exocom-received-request = (expected-results) ->
     wait-until (~> @service.received-messages.length), 1, ~>
       actual-request = @service.received-messages[0]
-      expect(actual-request.name).to.equal expected-request.NAME
-      expect(actual-request.payload).to.equal expected-request.PAYLOAD
+      expect(actual-request.name).to.equal expected-results.NAME
+      expect(actual-request.payload).to.equal expected-results.PAYLOAD
 
 
 
