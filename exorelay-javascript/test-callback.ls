@@ -1,10 +1,13 @@
+# a continuation-style method
 step1-cb = (done) ->
   done null, 1
 
+# another continuation-style method
 step2-cb = (done) ->
   done null, 2
 
 
+# call two continuation-style methods sequentially
 workflow-cb = (done) ->
   step1-cb (err, result1) ->
     | err  =>  return done err
