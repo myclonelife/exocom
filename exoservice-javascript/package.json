@@ -1,6 +1,6 @@
 {
   "name": "exoservice",
-  "version": "0.17.5",
+  "version": "0.21.4",
   "author": "Kevin Goslar",
   "bin": {
     "exo-js": "bin/exo-js",
@@ -11,10 +11,12 @@
     "debug": "2.6.0",
     "defaults": "1.0.3",
     "globby": "6.1.0",
-    "js-yaml": "3.7.0",
+    "js-yaml": "3.8.1",
     "livescript": "1.5.0",
-    "nitroglycerin": "1.1.2",
-    "rails-delegate": "0.6.2"
+    "rails-delegate": "0.6.2",
+    "uuid": "3.0.1",
+    "wait": "0.1.0",
+    "ws": "2.0.3"
   },
   "description": "Opinionated framework to create Exosphere micro-services in Node.js",
   "devDependencies": {
@@ -23,18 +25,18 @@
     "cucumber-snippets-livescript": "1.0.1",
     "dependency-lint": "4.3.1",
     "dim-console": "0.4.4",
-    "exocom-mock": "0.9.4",
+    "exocom-mock": "0.21.4",
     "exosphere-shared": "0.9.4",
     "json-loader": "0.5.4",
     "livescript-loader": "0.1.6",
+    "nitroglycerin": "1.1.2",
     "o-tools": "0.7.0",
     "o-tools-livescript": "1.2.3",
     "observable-process": "3.2.2",
     "port-reservation": "0.3.2",
     "prelude-ls": "1.1.2",
     "tertestrial": "0.3.2",
-    "wait": "0.1.0",
-    "webpack": "1.14.0"
+    "webpack": "2.2.1"
   },
   "engines": {
     "npm": ">= 3.0.0"
@@ -46,7 +48,7 @@
     "npm-shrinkwrap.json"
   ],
   "license": "ISC",
-  "main": "dist/exo-service.js",
+  "main": "dist/exo-js.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Originate/exoservice-js.git"
