@@ -12,16 +12,25 @@ worker = (done) ->
     done null, 1
 
 
-# can be called async or for promise
-wrapped-worker = (done) ->
-  | done  =>  worker done
-  | _     =>  from-callback worker
+# Makes the given callback-based worker function accessible as a generator and as a callback
+combo-api-for-callback = (worker) ->
+  (done) ->
+    | done  =>  worker done
+    | _     =>  from-callback worker
 
+
+
+# can be called async or be yielded
+wrapped-worker = combo-api-for-callback worker
 
 console.log 'starting'
 
+# normal call with callback
 wrapped-worker (err, result) ->
   console.log 'from callback:', err, result
+
+# normal call without callback: returns promise
+wrapped-worker!.then (result) -> console.log 'promise done', result
 
 do async ->*
   result = yield wrapped-worker!
