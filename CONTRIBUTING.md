@@ -86,3 +86,8 @@ Exocom let's services of all protection levels communicate.
   ```
   $ morula changed bin/spec
   ```
+
+
+## Publishing a new version
+
+* run `bin/publish`
