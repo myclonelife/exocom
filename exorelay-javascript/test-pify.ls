@@ -8,9 +8,10 @@ require! {
 async = coroutine
 
 
-worker = (done) ->
+worker = (number, done) ->
+  console.log number
   wait 500, ->
-    done null, 1
+    done null, number
 
 
 # can be called async or be yielded
@@ -19,12 +20,12 @@ wrapped-worker = pify worker
 console.log 'starting'
 
 # normal call with callback
-wrapped-worker (err, result) ->
+wrapped-worker 1, (err, result) ->
   console.log 'from callback:', err, result
 
 # normal call without callback: returns promise
-wrapped-worker!.then (result) -> console.log 'promise done', result
+wrapped-worker(2).then (result) -> console.log 'promise done', result
 
 do async ->*
-  result = yield wrapped-worker!
+  result = yield wrapped-worker 3
   console.log 'yield done:' result
